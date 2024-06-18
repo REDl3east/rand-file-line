@@ -10,5 +10,5 @@ cd build
 cmake ..
 make
 
-./rfl INFILE OUTFILE
+./rfl INFILE [OUTFILE]
 ```
