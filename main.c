@@ -18,18 +18,15 @@ int line_append(lines* lines, cstring_view value);
 void extract_lines(lines* lines, cstring_view input);
 
 int main(int argc, char** argv) {
-  if (argc != 3) {
-    fprintf(stderr, "Expected 2 arguments, got %d.\n", argc - 1);
-    fprintf(stderr, "Usage: %s INFILE OUTFILE\n", argv[0]);
+  if (argc > 3 || argc < 2) {
+    fprintf(stderr, "Expected 1 or 2 arguments, got %d.\n", argc - 1);
+    fprintf(stderr, "Usage: %s INFILE [OUTFILE]\n", argv[0]);
     return 1;
   }
 
-  const char* infile  = argv[1];
-  const char* outfile = argv[2];
-
   cstring_view infile_data;
-  if (!sv_read_file(infile, &infile_data)) {
-    printf("Failed to read '%s': %s\n", infile, strerror(errno));
+  if (!sv_read_file(argv[1], &infile_data)) {
+    printf("Failed to read '%s': %s\n", argv[1], strerror(errno));
     return 1;
   }
 
@@ -42,21 +39,23 @@ int main(int argc, char** argv) {
 
   printf(sv_fmt "\n", sv_arg(lines.lines[line]));
 
-  FILE* f = fopen(outfile, "w");
-  if (f == NULL) {
-    printf("Failed to open '%s': %s\n", outfile, strerror(errno));
-    free(lines.lines);
-    sv_read_file_free(infile_data);
-    return 1;
-  }
+  if (argc == 3) {
+    FILE* f = fopen(argv[2], "w");
+    if (f == NULL) {
+      printf("Failed to open '%s': %s\n", argv[2], strerror(errno));
+      free(lines.lines);
+      sv_read_file_free(infile_data);
+      return 1;
+    }
 
-  // write back to same file without random line
-  for (int i = 0; i < lines.count; i++) {
-    if (i != line)
-      fprintf(f, sv_fmt "\n", sv_arg(lines.lines[i]));
-  }
+    // write back to same file without random line
+    for (int i = 0; i < lines.count; i++) {
+      if (i != line)
+        fprintf(f, sv_fmt "\n", sv_arg(lines.lines[i]));
+    }
 
-  fclose(f);
+    fclose(f);
+  }
 
   free(lines.lines);
   sv_read_file_free(infile_data);
