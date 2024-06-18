@@ -1,6 +1,6 @@
-# Rand File Line (rfl)
+# Random File Line (rfl)
 
-A command line tool that selects a random line from a file, then writes the content of the file, except the
+A command line tool that selects a random line from a file, then optionally writes the content of the file, except the
 extracted line, to a new file.
 
 # Quick Start
